@@ -39,7 +39,9 @@ fun FavoriteScreen(viewModel: FavoriteViewModel = hiltViewModel()) {
         TextSnackBarContainer(
             snackbarText = snackBarTextState,
             showSnackbar = showSnackBarState,
-            onDismissSnackbar = { viewModel.dismissSnackBar() }
+            onDismissSnackbar = { viewModel.dismissSnackBar() },
+            onAction = { viewModel.undoRemovedImage() },
+            actionLael = stringResource(id = R.string.action_label_removed_image)
         ) {
             when (val state = favoriteUiState) {
                 is FavoriteUiState.Loading -> LoadingView(isLoading = true)
