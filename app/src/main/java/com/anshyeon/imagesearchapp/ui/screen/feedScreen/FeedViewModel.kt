@@ -64,22 +64,13 @@ class FeedViewModel @Inject constructor(
         return debouncedSearchQuery
             .flatMapLatest { queryString ->
                 imageRepository.searchImages(queryString) {
+                    showSnackBarWithMessage(Constants.RETRY_ERROR_MESSAGE)
                 }.cachedIn(viewModelScope)
             }.combine(favoriteImages) { search, favorite ->
                 search.map { unsplashImage ->
                     unsplashImage.copy(isLiked = favorite.any { it == unsplashImage.id })
                 }
             }
-    }
-
-    fun toggleFavorite(image: UnsplashImage) {
-        viewModelScope.launch {
-            if (image.isLiked) {
-                imageRepository.deleteImageFromFavorites(image)
-            } else {
-                imageRepository.addImageToFavorites(image)
-            }
-        }
     }
 
     fun updateQuery(newQuery: String) {
