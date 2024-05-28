@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,6 +7,10 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("kotlinx-serialization")
 }
+
+val properties = Properties()
+properties.load(project.rootProject.file("local.properties").inputStream())
+
 
 android {
     namespace = "com.anshyeon.imagesearchapp"
@@ -16,6 +22,13 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "UNSPLASH_CLIENT_ID", properties["unsplash_client_id"] as String)
+        buildConfigField(
+            "String",
+            "UNSPLASH_BASE_URL",
+            properties["unsplash_base_url"] as String
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -41,6 +54,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.8"
