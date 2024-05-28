@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">imagesearchapp</string>
+
+    <string name="hint_search_image">검색어를 입력하세요.</string>
+    <string name="start_search_message">원하는 이미지를 검색하세요!</string>
 </resources>
