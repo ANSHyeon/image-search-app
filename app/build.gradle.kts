@@ -11,7 +11,6 @@ plugins {
 val properties = Properties()
 properties.load(project.rootProject.file("local.properties").inputStream())
 
-
 android {
     namespace = "com.anshyeon.imagesearchapp"
     compileSdk = 34
