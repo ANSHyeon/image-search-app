@@ -4,4 +4,5 @@
     <string name="hint_search_image">검색어를 입력하세요.</string>
     <string name="start_search_message">원하는 이미지를 검색하세요!</string>
     <string name="favorites_empty_message">좋아요를 누른 이미지가 없습니다.</string>
+    <string name="error_message">오류</string>
 </resources>

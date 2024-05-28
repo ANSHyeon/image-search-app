@@ -64,6 +64,7 @@ class FeedViewModel @Inject constructor(
         return debouncedSearchQuery
             .flatMapLatest { queryString ->
                 imageRepository.searchImages(queryString) {
+                    setFeedUiState(FeedUiState.Error)
                     showSnackBarWithMessage(Constants.RETRY_ERROR_MESSAGE)
                 }.cachedIn(viewModelScope)
             }.combine(favoriteImages) { search, favorite ->
@@ -86,5 +87,6 @@ class FeedViewModel @Inject constructor(
 
 sealed interface FeedUiState {
     data object Start : FeedUiState
+    data object Error : FeedUiState
     data object Success : FeedUiState
 }
