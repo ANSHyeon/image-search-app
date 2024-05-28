@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UnsplashImage(
     val id: String,
-    val url: UnsplashImageUrl,
+    val urls: UnsplashImageUrl,
     var isLiked: Boolean = false
 )
 
