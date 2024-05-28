@@ -19,12 +19,23 @@ open class BaseViewModel(
     private val _showSnackBar = MutableStateFlow(false)
     val showSnackBar: StateFlow<Boolean> = _showSnackBar
 
+    private var lastRemovedImage: UnsplashImage? = null
+
     fun toggleFavorite(image: UnsplashImage) {
         viewModelScope.launch {
             if (image.isLiked) {
                 imageRepository.deleteImageFromFavorites(image)
+                lastRemovedImage = image
                 showSnackBarWithMessage(Constants.REMOVE_IMAGE_MESSAGE)
             } else {
+                imageRepository.addImageToFavorites(image)
+            }
+        }
+    }
+
+    fun undoRemovedImage() {
+        viewModelScope.launch {
+            lastRemovedImage?.let { image ->
                 imageRepository.addImageToFavorites(image)
             }
         }
