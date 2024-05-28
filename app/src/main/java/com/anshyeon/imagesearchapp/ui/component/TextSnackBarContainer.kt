@@ -9,6 +9,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,6 +26,8 @@ fun TextSnackBarContainer(
     onDismissSnackbar: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onAction: () -> Unit = {},
+    actionLael: String? = null,
     content: @Composable () -> Unit
 ) {
     Box(modifier) {
@@ -34,10 +37,14 @@ fun TextSnackBarContainer(
         LaunchedEffect(showSnackbar, snackbarText) {
             if (showSnackbar) {
                 try {
-                    snackbarHostState.showSnackbar(
+                    val result = snackbarHostState.showSnackbar(
                         message = snackbarText,
+                        actionLabel = actionLael,
                         duration = SnackbarDuration.Short
                     )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        onAction()
+                    }
                 } finally {
                     onDismissState()
                 }
