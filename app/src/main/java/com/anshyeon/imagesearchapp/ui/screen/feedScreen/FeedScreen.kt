@@ -37,15 +37,24 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.anshyeon.imagesearchapp.R
 import com.anshyeon.imagesearchapp.data.model.UnsplashImage
 import com.anshyeon.imagesearchapp.ui.component.ImageBox
+import com.anshyeon.imagesearchapp.ui.component.TextSnackBarContainer
 
 @Composable
 fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
     val query by viewModel.searchQuery.collectAsStateWithLifecycle()
     val feedUiState = viewModel.feedUiState.collectAsStateWithLifecycle().value
     val searchResults = viewModel.searchResults.collectAsLazyPagingItems()
+    val snackBarTextState by viewModel.snackBarText.collectAsStateWithLifecycle()
+    val showSnackBarState by viewModel.showSnackBar.collectAsStateWithLifecycle()
 
     Surface(Modifier.fillMaxSize()) {
-        FeedBody(feedUiState, query, viewModel, searchResults)
+        TextSnackBarContainer(
+            snackbarText = snackBarTextState,
+            showSnackbar = showSnackBarState,
+            onDismissSnackbar = { viewModel.dismissSnackBar() }
+        ) {
+            FeedBody(feedUiState, query, viewModel, searchResults)
+        }
     }
 
 }

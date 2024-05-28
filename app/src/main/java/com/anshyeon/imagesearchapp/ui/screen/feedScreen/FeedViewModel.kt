@@ -1,12 +1,12 @@
 package com.anshyeon.imagesearchapp.ui.screen.feedScreen
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.anshyeon.imagesearchapp.data.model.UnsplashImage
 import com.anshyeon.imagesearchapp.data.repository.ImageRepository
+import com.anshyeon.imagesearchapp.ui.screen.BaseViewModel
 import com.anshyeon.imagesearchapp.utilities.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val imageRepository: ImageRepository,
-) : ViewModel() {
+) : BaseViewModel(imageRepository) {
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery
@@ -64,22 +64,13 @@ class FeedViewModel @Inject constructor(
         return debouncedSearchQuery
             .flatMapLatest { queryString ->
                 imageRepository.searchImages(queryString) {
+                    showSnackBarWithMessage(Constants.RETRY_ERROR_MESSAGE)
                 }.cachedIn(viewModelScope)
             }.combine(favoriteImages) { search, favorite ->
                 search.map { unsplashImage ->
                     unsplashImage.copy(isLiked = favorite.any { it == unsplashImage.id })
                 }
             }
-    }
-
-    fun toggleFavorite(image: UnsplashImage) {
-        viewModelScope.launch {
-            if (image.isLiked) {
-                imageRepository.deleteImageFromFavorites(image)
-            } else {
-                imageRepository.addImageToFavorites(image)
-            }
-        }
     }
 
     fun updateQuery(newQuery: String) {

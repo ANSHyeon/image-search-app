@@ -27,15 +27,24 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anshyeon.imagesearchapp.R
 import com.anshyeon.imagesearchapp.ui.component.ImageBox
 import com.anshyeon.imagesearchapp.ui.component.LoadingView
+import com.anshyeon.imagesearchapp.ui.component.TextSnackBarContainer
 
 @Composable
 fun FavoriteScreen(viewModel: FavoriteViewModel = hiltViewModel()) {
     val favoriteUiState by viewModel.favoriteUiState.collectAsStateWithLifecycle()
+    val snackBarTextState by viewModel.snackBarText.collectAsStateWithLifecycle()
+    val showSnackBarState by viewModel.showSnackBar.collectAsStateWithLifecycle()
 
     Surface(Modifier.fillMaxSize()) {
-        when (val state = favoriteUiState) {
-            is FavoriteUiState.Loading -> LoadingView(isLoading = true)
-            is FavoriteUiState.Success -> FavoriteBody(state, viewModel)
+        TextSnackBarContainer(
+            snackbarText = snackBarTextState,
+            showSnackbar = showSnackBarState,
+            onDismissSnackbar = { viewModel.dismissSnackBar() }
+        ) {
+            when (val state = favoriteUiState) {
+                is FavoriteUiState.Loading -> LoadingView(isLoading = true)
+                is FavoriteUiState.Success -> FavoriteBody(state, viewModel)
+            }
         }
     }
 }
