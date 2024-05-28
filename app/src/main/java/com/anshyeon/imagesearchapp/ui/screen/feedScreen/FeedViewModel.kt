@@ -1,12 +1,12 @@
 package com.anshyeon.imagesearchapp.ui.screen.feedScreen
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.anshyeon.imagesearchapp.data.model.UnsplashImage
 import com.anshyeon.imagesearchapp.data.repository.ImageRepository
+import com.anshyeon.imagesearchapp.ui.screen.BaseViewModel
 import com.anshyeon.imagesearchapp.utilities.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val imageRepository: ImageRepository,
-) : ViewModel() {
+) : BaseViewModel(imageRepository) {
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery
