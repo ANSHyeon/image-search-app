@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.map
 import com.anshyeon.imagesearchapp.data.model.UnsplashImage
-import com.anshyeon.imagesearchapp.data.repository.UnsplashImageRepository
+import com.anshyeon.imagesearchapp.data.repository.ImageRepository
 import com.anshyeon.imagesearchapp.utilities.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,16 +14,18 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
-    private val unsplashImageRepository: UnsplashImageRepository,
+    private val imageRepository: ImageRepository,
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -34,6 +37,11 @@ class FeedViewModel @Inject constructor(
     private val _searchResults: MutableStateFlow<PagingData<UnsplashImage>> =
         MutableStateFlow(PagingData.empty())
     val searchResults: StateFlow<PagingData<UnsplashImage>> = _searchResults
+
+    private val favoriteImages = imageRepository.getFavoriteImages()
+        .map { favorites ->
+            favorites.map { it.id }
+        }
 
     @OptIn(FlowPreview::class)
     val debouncedSearchQuery: Flow<String> = searchQuery
@@ -55,9 +63,23 @@ class FeedViewModel @Inject constructor(
     private fun getSearchResults(): Flow<PagingData<UnsplashImage>> {
         return debouncedSearchQuery
             .flatMapLatest { queryString ->
-                unsplashImageRepository.searchImages(queryString) {
+                imageRepository.searchImages(queryString) {
                 }.cachedIn(viewModelScope)
+            }.combine(favoriteImages) { search, favorite ->
+                search.map { unsplashImage ->
+                    unsplashImage.copy(isLiked = favorite.any { it == unsplashImage.id })
+                }
             }
+    }
+
+    fun toggleFavorite(image: UnsplashImage) {
+        viewModelScope.launch {
+            if (image.isLiked) {
+                imageRepository.deleteImageFromFavorites(image)
+            } else {
+                imageRepository.addImageToFavorites(image)
+            }
+        }
     }
 
     fun updateQuery(newQuery: String) {

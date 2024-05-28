@@ -113,7 +113,7 @@ private fun SearchResultBody(
             searchResults[index]?.let { image ->
                 ImageBox(
                     image = image,
-                    onLikeClick = { })
+                    onLikeClick = { viewModel.toggleFavorite(image) })
             }
         }
     }
